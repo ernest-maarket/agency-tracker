@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agency Tracker</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
   --ink: #0F1923;
@@ -33,7 +33,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
 
 /* TOP BAR */
 .topbar {
@@ -41,7 +41,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
   display: flex; align-items: center; padding: 0 24px; gap: 12px;
   position: sticky; top: 0; z-index: 200;
 }
-.topbar-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: white; display: flex; align-items: center; gap: 8px; }
+.topbar-logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; color: white; display: flex; align-items: center; gap: 8px; }
 .topbar-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 .topbar-spacer { flex: 1; }
 .topbar-badge {
@@ -52,7 +52,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .topbar-btn {
   display: flex; align-items: center; gap: 6px;
   padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
-  font-family: 'Instrument Sans', sans-serif; cursor: pointer; border: none; transition: all 0.15s;
+  font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s;
 }
 .topbar-btn.ghost { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); }
 .topbar-btn.ghost:hover { background: rgba(255,255,255,0.13); color: white; }
@@ -76,7 +76,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .ctab-avatar {
   width: 28px; height: 28px; border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; font-family: 'Syne', sans-serif; color: white; flex-shrink: 0;
+  font-size: 11px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: white; flex-shrink: 0;
 }
 .ctab-info { flex: 1; min-width: 0; }
 .ctab-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -84,7 +84,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .ctab-count { font-size: 10px; font-weight: 600; border-radius: 10px; padding: 1px 6px; background: var(--red-pale); color: var(--red); }
 .ctab-count.done { background: var(--green-pale); color: var(--green); }
 
-.sidebar-add { margin: 8px 12px; padding: 8px 12px; border-radius: 8px; border: 1.5px dashed var(--line); font-size: 12px; color: var(--ink-muted); cursor: pointer; text-align: center; transition: all 0.15s; background: transparent; font-family: 'Instrument Sans', sans-serif; }
+.sidebar-add { margin: 8px 12px; padding: 8px 12px; border-radius: 8px; border: 1.5px dashed var(--line); font-size: 12px; color: var(--ink-muted); cursor: pointer; text-align: center; transition: all 0.15s; background: transparent; font-family: 'Inter', sans-serif; }
 .sidebar-add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-pale); }
 .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--line); padding: 12px; }
 .sidebar-stat { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-muted); padding: 3px 0; }
@@ -95,13 +95,13 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 
 /* CLIENT HEADER */
 .client-hd { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
-.client-hd-av { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; font-family: 'Syne', sans-serif; color: white; flex-shrink: 0; }
+.client-hd-av { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; font-family: 'Space Grotesk', sans-serif; color: white; flex-shrink: 0; }
 .client-hd-info { flex: 1; }
-.client-hd-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+.client-hd-name { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
 .client-hd-sub { font-size: 13px; color: var(--ink-muted); }
 .client-hd-actions { display: flex; gap: 8px; align-items: center; }
 
-.btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Instrument Sans', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
 .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
 .btn-ghost:hover { border-color: var(--ink-muted); color: var(--ink); }
 .btn-orange { background: var(--accent); color: white; }
@@ -114,7 +114,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
 .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
 .kpi-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; margin-bottom: 4px; }
-.kpi-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }
+.kpi-val { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }
 .kpi-val.r { color: var(--red); }
 .kpi-val.g { color: var(--green); }
 .kpi-sub { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
@@ -127,7 +127,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 
 /* FILTERS */
 .filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-.ftab { padding: 5px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.12s; font-family: 'Instrument Sans', sans-serif; }
+.ftab { padding: 5px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.12s; font-family: 'Inter', sans-serif; }
 .ftab:hover { border-color: var(--ink-muted); }
 .ftab.active { background: var(--ink); color: white; border-color: var(--ink); }
 
@@ -135,7 +135,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .sec { margin-bottom: 24px; }
 .sec-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .sec-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-.sec-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; flex: 1; }
+.sec-name { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; flex: 1; }
 .sec-count { font-size: 11px; color: var(--ink-muted); background: var(--line-soft); padding: 2px 8px; border-radius: 10px; }
 
 /* TASK */
@@ -195,7 +195,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .comment-avatar {
   width: 22px; height: 22px; border-radius: 50%;
   background: var(--accent); color: white;
-  font-size: 9px; font-weight: 700; font-family: 'Syne', sans-serif;
+  font-size: 9px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
 }
 .comment-body { flex: 1; min-width: 0; }
@@ -209,7 +209,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .comment-add-row { display: flex; gap: 8px; margin-top: 10px; align-items: flex-end; }
 .comment-input {
   flex: 1; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--line);
-  font-size: 12.5px; font-family: 'Instrument Sans', sans-serif; color: var(--ink);
+  font-size: 12.5px; font-family: 'Inter', sans-serif; color: var(--ink);
   background: white; outline: none; resize: none; line-height: 1.4; min-height: 34px;
   transition: border-color 0.15s;
 }
@@ -217,7 +217,7 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .comment-submit {
   padding: 8px 12px; border-radius: 7px; background: var(--ink); border: none;
   color: white; font-size: 11px; font-weight: 600; cursor: pointer;
-  font-family: 'Instrument Sans', sans-serif; transition: background 0.15s; white-space: nowrap;
+  font-family: 'Inter', sans-serif; transition: background 0.15s; white-space: nowrap;
   height: 34px;
 }
 .comment-submit:hover { background: var(--ink-mid); }
@@ -229,9 +229,9 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 
 /* ADD TASK */
 .add-row { display: flex; gap: 8px; margin-top: 8px; }
-.add-input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; font-family: 'Instrument Sans', sans-serif; color: var(--ink); background: var(--surface); outline: none; transition: border-color 0.15s; }
+.add-input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; font-family: 'Inter', sans-serif; color: var(--ink); background: var(--surface); outline: none; transition: border-color 0.15s; }
 .add-input:focus { border-color: var(--accent); }
-.add-btn { padding: 9px 14px; border-radius: 8px; background: var(--line-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all 0.15s; font-family: 'Instrument Sans', sans-serif; }
+.add-btn { padding: 9px 14px; border-radius: 8px; background: var(--line-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
 .add-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
 
 /* READ-ONLY BANNER */
@@ -247,14 +247,14 @@ body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color:
 .overlay.open { display: flex; }
 .modal { background: var(--surface); border-radius: 14px; padding: 28px; width: 500px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.2s ease; }
 @keyframes modalIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-.modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
 .modal-sub { font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; line-height: 1.5; }
-.modal-input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--line); font-size: 14px; font-family: 'Instrument Sans', sans-serif; color: var(--ink); background: var(--bg); outline: none; margin-bottom: 10px; transition: border-color 0.15s; }
+.modal-input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--line); font-size: 14px; font-family: 'Inter', sans-serif; color: var(--ink); background: var(--bg); outline: none; margin-bottom: 10px; transition: border-color 0.15s; }
 .modal-input:focus { border-color: var(--accent); }
 textarea.modal-input { resize: vertical; line-height: 1.5; font-size: 12.5px; }
 .modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
-.modal-cancel { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; color: var(--ink-soft); cursor: pointer; font-family: 'Instrument Sans', sans-serif; }
-.modal-ok { padding: 9px 20px; border-radius: 8px; background: var(--accent); border: none; color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Instrument Sans', sans-serif; }
+.modal-cancel { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; color: var(--ink-soft); cursor: pointer; font-family: 'Inter', sans-serif; }
+.modal-ok { padding: 9px 20px; border-radius: 8px; background: var(--accent); border: none; color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
 .modal-ok:hover { background: #e55d28; }
 .modal-ok.purple { background: var(--purple); }
 .modal-ok.purple:hover { background: #7c4ef5; }
@@ -262,7 +262,7 @@ textarea.modal-input { resize: vertical; line-height: 1.5; font-size: 12.5px; }
 /* SHARE BOX */
 .share-box { display: flex; gap: 8px; align-items: center; background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
 .share-link { flex: 1; font-size: 11px; color: var(--ink-soft); word-break: break-all; font-family: monospace; }
-.share-copy { padding: 5px 12px; border-radius: 6px; background: var(--ink); color: white; border: none; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Instrument Sans', sans-serif; white-space: nowrap; }
+.share-copy { padding: 5px 12px; border-radius: 6px; background: var(--ink); color: white; border: none; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap; }
 .share-note { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
 .share-note strong { color: var(--ink-soft); }
 
