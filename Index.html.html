@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --ink: #0F1923;
+  --ink-mid: #2C3E50;
+  --ink-soft: #4A5568;
+  --ink-muted: #718096;
+  --line: #E2E8F0;
+  --line-soft: #EDF2F7;
+  --surface: #FFFFFF;
+  --bg: #F7F9FC;
+  --accent: #FF6B35;
+  --accent-pale: #FFF0EB;
+  --accent2: #3B82F6;
+  --accent2-pale: #EFF6FF;
+  --green: #10B981;
+  --green-pale: #ECFDF5;
+  --red: #EF4444;
+  --red-pale: #FEF2F2;
+  --yellow: #F59E0B;
+  --yellow-pale: #FFFBEB;
+  --purple: #8B5CF6;
+  --purple-pale: #F5F3FF;
+  --comment-bg: #FFFBF0;
+  --comment-border: #F59E0B30;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+/* TOP BAR */
+.topbar {
+  background: var(--ink); height: 52px;
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 15px; color: white; display: flex; align-items: center; gap: 8px; }
+.topbar-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.topbar-spacer { flex: 1; }
+.topbar-badge {
+  font-size: 11px; border-radius: 20px; padding: 4px 12px; font-weight: 500;
+  color: rgba(255,255,255,0.5); border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+}
+.topbar-badge.shared { color: var(--accent); border-color: rgba(255,107,53,0.4); background: rgba(255,107,53,0.08); }
+.topbar-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+  font-family: 'Instrument Sans', sans-serif; cursor: pointer; border: none; transition: all 0.15s;
+}
+.topbar-btn.ghost { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.75); }
+.topbar-btn.ghost:hover { background: rgba(255,255,255,0.13); color: white; }
+
+/* LAYOUT */
+.layout { display: flex; flex: 1; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px; flex-shrink: 0; background: var(--surface);
+  border-right: 1px solid var(--line); display: flex; flex-direction: column;
+  height: calc(100vh - 52px); position: sticky; top: 52px; overflow-y: auto;
+}
+.sidebar-label { font-size: 10px; font-weight: 600; color: var(--ink-muted); letter-spacing: .08em; text-transform: uppercase; padding: 16px 16px 6px; }
+.ctab {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+  cursor: pointer; border-left: 2px solid transparent; transition: all 0.15s;
+}
+.ctab:hover { background: var(--line-soft); }
+.ctab.active { background: var(--accent-pale); border-left-color: var(--accent); }
+.ctab-avatar {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; font-family: 'Syne', sans-serif; color: white; flex-shrink: 0;
+}
+.ctab-info { flex: 1; min-width: 0; }
+.ctab-name { font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ctab-type { font-size: 11px; color: var(--ink-muted); }
+.ctab-count { font-size: 10px; font-weight: 600; border-radius: 10px; padding: 1px 6px; background: var(--red-pale); color: var(--red); }
+.ctab-count.done { background: var(--green-pale); color: var(--green); }
+
+.sidebar-add { margin: 8px 12px; padding: 8px 12px; border-radius: 8px; border: 1.5px dashed var(--line); font-size: 12px; color: var(--ink-muted); cursor: pointer; text-align: center; transition: all 0.15s; background: transparent; font-family: 'Instrument Sans', sans-serif; }
+.sidebar-add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-pale); }
+.sidebar-bottom { margin-top: auto; border-top: 1px solid var(--line); padding: 12px; }
+.sidebar-stat { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-muted); padding: 3px 0; }
+.sidebar-stat strong { color: var(--ink); font-weight: 600; }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; height: calc(100vh - 52px); padding: 24px 28px 80px; }
+
+/* CLIENT HEADER */
+.client-hd { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.client-hd-av { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; font-family: 'Syne', sans-serif; color: white; flex-shrink: 0; }
+.client-hd-info { flex: 1; }
+.client-hd-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; line-height: 1.1; margin-bottom: 4px; }
+.client-hd-sub { font-size: 13px; color: var(--ink-muted); }
+.client-hd-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn { display: flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Instrument Sans', sans-serif; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
+.btn-ghost:hover { border-color: var(--ink-muted); color: var(--ink); }
+.btn-orange { background: var(--accent); color: white; }
+.btn-orange:hover { background: #e55d28; }
+.btn-purple { background: var(--purple); color: white; }
+.btn-purple:hover { background: #7c4ef5; }
+.btn-purple.syncing { opacity: 0.7; pointer-events: none; }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 24px; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.kpi-label { font-size: 11px; color: var(--ink-muted); font-weight: 500; margin-bottom: 4px; }
+.kpi-val { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }
+.kpi-val.r { color: var(--red); }
+.kpi-val.g { color: var(--green); }
+.kpi-sub { font-size: 11px; color: var(--ink-muted); margin-top: 4px; }
+
+/* PROGRESS */
+.prog-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.prog-bar { flex: 1; height: 5px; background: var(--line); border-radius: 4px; overflow: hidden; }
+.prog-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; }
+.prog-label { font-size: 12px; color: var(--ink-muted); white-space: nowrap; }
+
+/* FILTERS */
+.filters { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+.ftab { padding: 5px 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); font-size: 12px; font-weight: 500; color: var(--ink-soft); cursor: pointer; transition: all 0.12s; font-family: 'Instrument Sans', sans-serif; }
+.ftab:hover { border-color: var(--ink-muted); }
+.ftab.active { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* SECTION */
+.sec { margin-bottom: 24px; }
+.sec-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.sec-icon { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.sec-name { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; flex: 1; }
+.sec-count { font-size: 11px; color: var(--ink-muted); background: var(--line-soft); padding: 2px 8px; border-radius: 10px; }
+
+/* TASK */
+.task-wrap { margin-bottom: 6px; }
+.task {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start;
+  cursor: pointer; transition: all 0.12s; position: relative;
+}
+.task:hover { border-color: #CBD5E1; box-shadow: 0 1px 8px rgba(0,0,0,0.05); }
+.task.done { opacity: 0.5; background: var(--line-soft); }
+.task.done .task-title { text-decoration: line-through; color: var(--ink-muted); }
+.task.has-comments { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent; }
+.task.ai-new { border-color: var(--purple); background: var(--purple-pale); animation: slideIn 0.3s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
+
+.task-check { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid var(--line); flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 10px; }
+.task.done .task-check { background: var(--green); border-color: var(--green); color: white; }
+.task:hover .task-check { border-color: var(--accent); }
+
+.task-body { flex: 1; min-width: 0; }
+.task-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 5px; }
+.task-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag { font-size: 10.5px; font-weight: 500; padding: 2px 7px; border-radius: 8px; }
+.tag-high { background: var(--red-pale); color: var(--red); }
+.tag-med { background: var(--yellow-pale); color: var(--yellow); }
+.tag-low { background: var(--green-pale); color: var(--green); }
+.tag-ai { background: var(--purple-pale); color: var(--purple); }
+.tag-camp { background: var(--accent2-pale); color: var(--accent2); }
+.task-note { font-size: 11.5px; color: var(--ink-muted); font-style: italic; margin-top: 4px; line-height: 1.4; }
+
+.task-actions { display: flex; gap: 4px; align-items: flex-start; }
+.task-icon-btn {
+  opacity: 0; padding: 3px 5px; border-radius: 5px; background: none; border: none;
+  cursor: pointer; font-size: 13px; color: var(--ink-muted); transition: all 0.12s;
+  line-height: 1;
+}
+.task:hover .task-icon-btn { opacity: 1; }
+.task-icon-btn:hover { background: var(--line-soft); color: var(--ink); }
+.task-icon-btn.comment-btn { color: var(--yellow); }
+.task-icon-btn.comment-btn.has-c { opacity: 1; }
+
+/* COMMENTS PANEL */
+.comments-panel {
+  background: var(--comment-bg);
+  border: 1px solid var(--line);
+  border-top: 1px solid #FDE68A40;
+  border-radius: 0 0 8px 8px;
+  padding: 10px 14px 12px;
+  display: none;
+}
+.comments-panel.open { display: block; }
+
+.comment-item {
+  display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start;
+}
+.comment-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent); color: white;
+  font-size: 9px; font-weight: 700; font-family: 'Syne', sans-serif;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.comment-body { flex: 1; min-width: 0; }
+.comment-meta { font-size: 10.5px; color: var(--ink-muted); margin-bottom: 2px; }
+.comment-meta strong { color: var(--ink-soft); font-weight: 600; }
+.comment-text { font-size: 12.5px; color: var(--ink); line-height: 1.5; }
+.comment-del { opacity: 0; font-size: 11px; color: var(--ink-muted); background: none; border: none; cursor: pointer; padding: 0 2px; transition: all 0.12s; }
+.comment-item:hover .comment-del { opacity: 1; }
+.comment-del:hover { color: var(--red); }
+
+.comment-add-row { display: flex; gap: 8px; margin-top: 10px; align-items: flex-end; }
+.comment-input {
+  flex: 1; padding: 8px 10px; border-radius: 7px; border: 1px solid var(--line);
+  font-size: 12.5px; font-family: 'Instrument Sans', sans-serif; color: var(--ink);
+  background: white; outline: none; resize: none; line-height: 1.4; min-height: 34px;
+  transition: border-color 0.15s;
+}
+.comment-input:focus { border-color: var(--yellow); }
+.comment-submit {
+  padding: 8px 12px; border-radius: 7px; background: var(--ink); border: none;
+  color: white; font-size: 11px; font-weight: 600; cursor: pointer;
+  font-family: 'Instrument Sans', sans-serif; transition: background 0.15s; white-space: nowrap;
+  height: 34px;
+}
+.comment-submit:hover { background: var(--ink-mid); }
+
+.comment-count-badge {
+  background: var(--yellow-pale); color: var(--yellow);
+  font-size: 9px; font-weight: 700; border-radius: 8px; padding: 1px 5px; margin-left: 3px;
+}
+
+/* ADD TASK */
+.add-row { display: flex; gap: 8px; margin-top: 8px; }
+.add-input { flex: 1; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 13px; font-family: 'Instrument Sans', sans-serif; color: var(--ink); background: var(--surface); outline: none; transition: border-color 0.15s; }
+.add-input:focus { border-color: var(--accent); }
+.add-btn { padding: 9px 14px; border-radius: 8px; background: var(--line-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all 0.15s; font-family: 'Instrument Sans', sans-serif; }
+.add-btn:hover { background: var(--ink); color: white; border-color: var(--ink); }
+
+/* READ-ONLY BANNER */
+.readonly-banner {
+  background: var(--accent-pale); border: 1px solid rgba(255,107,53,0.2);
+  border-radius: 8px; padding: 10px 16px; margin-bottom: 20px;
+  font-size: 13px; color: var(--accent); font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* MODALS */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(15,25,35,0.55); z-index: 500; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
+.overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 14px; padding: 28px; width: 500px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.2s ease; }
+@keyframes modalIn { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+.modal-sub { font-size: 13px; color: var(--ink-muted); margin-bottom: 20px; line-height: 1.5; }
+.modal-input { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--line); font-size: 14px; font-family: 'Instrument Sans', sans-serif; color: var(--ink); background: var(--bg); outline: none; margin-bottom: 10px; transition: border-color 0.15s; }
+.modal-input:focus { border-color: var(--accent); }
+textarea.modal-input { resize: vertical; line-height: 1.5; font-size: 12.5px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+.modal-cancel { padding: 9px 18px; border-radius: 8px; border: 1px solid var(--line); background: transparent; font-size: 13px; font-weight: 500; color: var(--ink-soft); cursor: pointer; font-family: 'Instrument Sans', sans-serif; }
+.modal-ok { padding: 9px 20px; border-radius: 8px; background: var(--accent); border: none; color: white; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Instrument Sans', sans-serif; }
+.modal-ok:hover { background: #e55d28; }
+.modal-ok.purple { background: var(--purple); }
+.modal-ok.purple:hover { background: #7c4ef5; }
+
+/* SHARE BOX */
+.share-box { display: flex; gap: 8px; align-items: center; background: var(--bg); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.share-link { flex: 1; font-size: 11px; color: var(--ink-soft); word-break: break-all; font-family: monospace; }
+.share-copy { padding: 5px 12px; border-radius: 6px; background: var(--ink); color: white; border: none; font-size: 11px; font-weight: 600; cursor: pointer; font-family: 'Instrument Sans', sans-serif; white-space: nowrap; }
+.share-note { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+.share-note strong { color: var(--ink-soft); }
+
+/* AI LOG */
+.ai-log { background: var(--purple-pale); border: 1px solid rgba(139,92,246,0.2); border-radius: 8px; padding: 14px; margin-bottom: 16px; display: none; }
+.ai-log.open { display: block; }
+.ai-log-title { font-size: 12px; font-weight: 600; color: var(--purple); margin-bottom: 6px; }
+.ai-log-body { font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 20px; right: 20px; z-index: 999; background: var(--ink); color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 500; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* EMPTY */
+.empty { text-align: center; padding: 40px 20px; color: var(--ink-muted); font-size: 13px; }
+.empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+@media(max-width:700px) {
+  .sidebar { display: none; }
+  .content { padding: 16px 14px 60px; }
+  .kpi-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo"><div class="topbar-dot"></div>Agency Tracker</div>
+  <div class="topbar-spacer"></div>
+  <span class="topbar-badge" id="modeBadge">Master View</span>
+  <button class="topbar-btn ghost" id="shareTopBtn" onclick="openShareModal()">⬡ Share Board</button>
+</div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-label">Clients</div>
+    <div id="clientList"></div>
+    <button class="sidebar-add" onclick="openAddClientModal()">+ Add Client</button>
+    <div class="sidebar-bottom">
+      <div class="sidebar-stat"><span>Total tasks</span><strong id="sTotal">0</strong></div>
+      <div class="sidebar-stat"><span>Completed</span><strong id="sDone">0</strong></div>
+      <div class="sidebar-stat"><span>High priority open</span><strong id="sHigh">0</strong></div>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+</div>
+
+<!-- ADD CLIENT MODAL -->
+<div class="overlay" id="addClientModal">
+  <div class="modal">
+    <div class="modal-title">Add New Client</div>
+    <div class="modal-sub">Creates a new client board you can manage and share independently.</div>
+    <input class="modal-input" id="nc_name" placeholder="Client name">
+    <input class="modal-input" id="nc_type" placeholder="Service type (e.g. Google Ads, SEO, Social)">
+    <input class="modal-input" id="nc_ctx" placeholder="Context notes (optional)">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeOverlay('addClientModal')">Cancel</button>
+      <button class="modal-ok" onclick="confirmAddClient()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="overlay" id="shareModal">
+  <div class="modal">
+    <div class="modal-title">Share Client Board</div>
+    <div class="modal-sub" id="shareSub"></div>
+    <div style="margin-bottom:12px;">
+      <label style="font-size:12px;font-weight:600;color:var(--ink-soft);display:block;margin-bottom:6px;">Your name (shows on comments you add)</label>
+      <input class="modal-input" id="shareAuthorName" placeholder="e.g. Ernest" style="margin:0">
+    </div>
+    <div class="share-box" id="shareBox" style="display:none">
+      <span class="share-link" id="shareLink"></span>
+      <button class="share-copy" onclick="copyLink()">Copy</button>
+    </div>
+    <div class="share-note" id="shareNote">
+      This link encodes the <strong>full current state</strong> of this board — tasks, statuses, and all comments — into the URL. Anyone with the link sees a read-only snapshot. Regenerate the link any time you want to push a fresh update to them.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeOverlay('shareModal')">Close</button>
+      <button class="modal-ok" onclick="generateShareLink()">Generate Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI SYNC MODAL -->
+<div class="overlay" id="aiModal">
+  <div class="modal">
+    <div class="modal-title">⚡ AI Task Sync</div>
+    <div class="modal-sub">Paste your Claude conversation or notes. AI extracts new actionable tasks and adds them to the board — skipping anything already there.</div>
+    <textarea class="modal-input" id="aiInput" rows="6" placeholder="Paste your Claude conversation or project notes here…"></textarea>
+    <div class="ai-log" id="aiLog">
+      <div class="ai-log-title">⚡ Tasks extracted:</div>
+      <div class="ai-log-body" id="aiLogBody"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeOverlay('aiModal')">Cancel</button>
+      <button class="modal-ok purple" id="aiBtn" onclick="runAISync()">Extract Tasks</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONSTANTS ──────────────────────────────────
+const COLORS = ['#FF6B35','#3B82F6','#10B981','#8B5CF6','#F59E0B','#EC4899','#06B6D4','#84CC16'];
+
+const SECS = {
+  budget:     { label:'Budget & Scaling',         icon:'💰', bg:'#FFF7ED' },
+  conversion: { label:'Conversion Tracking',       icon:'📊', bg:'#FEF2F2' },
+  campaign:   { label:'Campaign Structure',         icon:'🗂️', bg:'#EFF6FF' },
+  assetgroup: { label:'Asset Groups',               icon:'🖼️', bg:'#F0FDF4' },
+  keywords:   { label:'Keywords & Negatives',       icon:'🔍', bg:'#ECFDF5' },
+  adcopy:     { label:'Ad Copy',                    icon:'✏️', bg:'#F5F3FF' },
+  extensions: { label:'Extensions',                 icon:'🔗', bg:'#EFF6FF' },
+  reporting:  { label:'Reporting & Comms',          icon:'📋', bg:'#FFFBEB' },
+  content:    { label:'Content',                    icon:'📝', bg:'#F0FDF4' },
+  seo:        { label:'SEO',                        icon:'🌐', bg:'#EFF6FF' },
+  social:     { label:'Social Media',               icon:'📱', bg:'#FDF4FF' },
+  general:    { label:'General',                    icon:'📌', bg:'#F8FAFC' },
+};
+
+const DLD = [
+  {id:'d01',sec:'budget',    pri:'high',title:'Increase Emergency Search Campaign daily budget — $30/day is budget-limited',               note:'50 conv at $18.33 CPA. Recommend $50–60/day minimum.',         camp:'Emergency Search',done:false,comments:[]},
+  {id:'d02',sec:'budget',    pri:'high',title:'Review PMax $120/day budget cap — restricting top performer',                              note:'$3,650 spent, 1,521 conv at $2.40 CPA — strong ROAS, room to scale.',camp:'Leads / PMax',  done:false,comments:[]},
+  {id:'d03',sec:'conversion',pri:'high',title:'Audit conversion tracking — 12,921 interactions vs 1,571 tracked conversions discrepancy', note:'Multiple action types may be double-counting or misfiring.',     camp:'All',            done:false,comments:[]},
+  {id:'d04',sec:'campaign',  pri:'high',title:'Build dedicated Emergency RSA Search campaign with expanded budget',                        note:'Current call-only has 25.77% conv rate — RSA alongside would scale.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d05',sec:'campaign',  pri:'med', title:'Evaluate splitting PMax into Emergency + General/Family campaigns',                         note:'Family (23.22% CVR) and Emergency (16.68% CVR) have distinct intent signals.',camp:'Leads / PMax',done:false,comments:[]},
+  {id:'d06',sec:'campaign',  pri:'low', title:'Archive "AI Generated Assets" asset group — 0 impressions, currently paused',              note:'Confirm no active spend before deleting.',                        camp:'Leads / PMax',   done:false,comments:[]},
+  {id:'d07',sec:'assetgroup',pri:'high',title:'Fix typo: rename "Emergecy - Same day" → "Emergency - Same Day"',                         note:'Reporting clarity fix.',                                          camp:'Leads / PMax',   done:false,comments:[]},
+  {id:'d08',sec:'assetgroup',pri:'high',title:'Add 5th description to Emergency asset group (currently 4, Google recommends 5)',          note:'More copy = higher ad strength. Currently "Good" — can hit "Excellent".',camp:'Leads / PMax',done:false,comments:[]},
+  {id:'d09',sec:'assetgroup',pri:'med', title:'Upgrade Insurance/Affordability to "Excellent" ad strength',                               note:'Best performer at $2.23 cost/conv. Add remaining headlines to hit 15.',camp:'Leads / PMax',done:false,comments:[]},
+  {id:'d10',sec:'assetgroup',pri:'med', title:'Add portrait marketing images (9:16) to all 3 active asset groups — aim for 5 each',      note:'Insurance=5, Emergency=3, Family=4. Stories placements.',         camp:'Leads / PMax',   done:false,comments:[]},
+  {id:'d11',sec:'assetgroup',pri:'med', title:'Upload custom Davis Lake branded photos to replace Google auto-served images',             note:'All current images are Google-served URLs — branded photography improves CTR.',camp:'Leads / PMax',done:false,comments:[]},
+  {id:'d12',sec:'keywords',  pri:'high',title:'Add competitor brand negatives: aspen dental, landmark dentistry, carolina dental associates, pearl dentistry', note:'All appear in search terms — wasted spend.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d13',sec:'keywords',  pri:'high',title:'Add service negatives: orthodontist, prosthodontics, concord orthodontist',                note:'Not DLD services — generating irrelevant traffic.',               camp:'Emergency Search',done:false,comments:[]},
+  {id:'d14',sec:'keywords',  pri:'high',title:'Add Spanish-language negatives: dentista cerca de mi, odontología cerca de mi',           note:'Confirm with Dr. Chetan if Spanish audience is intentionally targeted.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d15',sec:'keywords',  pri:'med', title:'Add exact match keywords: "emergency dentist near me", "dentist charlotte nc", "walk in dentist near me"', note:'Already converting as variants — pin as exact for control.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d16',sec:'keywords',  pri:'med', title:'Add PMax search themes: "same day dentist charlotte", "dentist open saturday"',            note:'Weekend/Saturday terms appear in search data and convert.',       camp:'Leads / PMax',   done:false,comments:[]},
+  {id:'d17',sec:'keywords',  pri:'low', title:'Evaluate "endodontist charlotte nc" — add as negative if DLD doesn\'t offer endodontics', note:'Appears in search terms. Confirm service scope with client.',     camp:'Emergency Search',done:false,comments:[]},
+  {id:'d18',sec:'adcopy',    pri:'high',title:'Write 3 new RSA headlines: Charlotte + same-day focused',                                  note:'"Same-Day Dentist in Charlotte", "Tooth Pain? We See You Today".',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d19',sec:'adcopy',    pri:'med', title:'Add zip code headlines: "Dentist Near 28216", "Dentist 28216"',                            note:'Zip terms convert in search report. Pinning improves local relevance.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d20',sec:'adcopy',    pri:'med', title:'Add insurance-specific description: "We Accept Delta Dental, Cigna & Most Major PPOs"',   note:'Insurance is top asset group — reinforce with specific plan names.',camp:'Leads / PMax',   done:false,comments:[]},
+  {id:'d21',sec:'extensions',pri:'high',title:'Verify all sitelink extensions are live and pointing to correct landing pages',            note:'Sitelinks drove 22.62% CVR in ad group report. Check: Services, Insurance, Book Now, Contact.',camp:'Emergency Search',done:false,comments:[]},
+  {id:'d22',sec:'extensions',pri:'med', title:'Add callout extensions: "Accepting New Patients", "Same-Day Appointments", "Most Insurance Accepted"', note:'Increases ad real estate at no cost.',camp:'All',done:false,comments:[]},
+  {id:'d23',sec:'extensions',pri:'med', title:'Add structured snippet for services: Cleanings, Crowns, Fillings, Emergency Care',        note:'Helps match intent before the click.',                            camp:'All',            done:false,comments:[]},
+  {id:'d24',sec:'extensions',pri:'low', title:'Confirm business hours in location extension match actual DLD office hours',               note:'10 driving direction clicks in Search — local presence is active.', camp:'All',           done:false,comments:[]},
+  {id:'d25',sec:'reporting', pri:'high',title:'Set up monthly CPA alert: flag if Search CPA >$5 or PMax CPA >$4',                        note:'Current: Search $18.33, PMax $2.40.',                             camp:'All',            done:false,comments:[]},
+  {id:'d26',sec:'reporting', pri:'med', title:'Build May 2026 performance report using April as baseline',                                note:'April totals: $4,567 spend, 1,571 conv, $2.91 CPA.',             camp:'All',            done:false,comments:[]},
+  {id:'d27',sec:'reporting', pri:'low', title:'Share April report summary with Dr. Chetan — highlight PMax efficiency and scaling opportunity', note:'Key win: $2.40 cost/conv. Both campaigns budget-limited = ready to scale.',camp:'All',done:false,comments:[]},
+];
+
+const DEFAULT_CLIENTS = [
+  { id:'dld', name:'Davis Lake Dental',         type:'Google Ads',           color:COLORS[0], ctx:'Charlotte, NC. Owner Dr. Chetan. April 2026 data.', tasks: DLD.map(t=>({...t,comments:[...t.comments]})) },
+  { id:'c2',  name:'Arden Mill Dentistry',       type:'Google Ads + Content', color:COLORS[1], ctx:'', tasks:[] },
+  { id:'c3',  name:'Sunrise Family Dentistry',   type:'Content + Social',     color:COLORS[2], ctx:'', tasks:[] },
+  { id:'c4',  name:'Healthy Dental Alternatives',type:'Google Ads',           color:COLORS[3], ctx:'', tasks:[] },
+  { id:'c5',  name:'Client 5',                   type:'SEO',                  color:COLORS[4], ctx:'', tasks:[] },
+  { id:'c6',  name:'Client 6',                   type:'Social Media',         color:COLORS[5], ctx:'', tasks:[] },
+  { id:'c7',  name:'Client 7',                   type:'Google Ads',           color:COLORS[6], ctx:'', tasks:[] },
+];
+
+// ── STATE ──────────────────────────────────────
+let S = {
+  clients: [],
+  active: 'dld',
+  filter: 'all',
+  readonly: false,
+  authorName: 'Ernest',
+  openComments: {}, // taskId -> bool
+};
+
+// ── STORAGE ───────────────────────────────────
+function save() {
+  try {
+    const toSave = {
+      clients: S.clients,
+      active: S.active,
+      authorName: S.authorName
+    };
+    localStorage.setItem('agt_v3', JSON.stringify(toSave));
+  } catch(e) {}
+}
+
+function load() {
+  // Check for shared snapshot in URL
+  try {
+    const hash = decodeURIComponent(window.location.hash.slice(1));
+    if (hash.startsWith('snap:')) {
+      const data = JSON.parse(atob(hash.slice(5)));
+      // Show single client, read-only
+      S.clients = [data.client];
+      S.active = data.client.id;
+      S.readonly = true;
+      S.authorName = data.authorName || 'Ernest';
+      document.getElementById('modeBadge').textContent = '👁 Read-Only View';
+      document.getElementById('modeBadge').classList.add('shared');
+      document.getElementById('shareTopBtn').style.display = 'none';
+      document.getElementById('sidebar').style.display = 'none';
+      return;
+    }
+  } catch(e) {}
+
+  // Normal load
+  try {
+    const raw = localStorage.getItem('agt_v3');
+    if (raw) {
+      const saved = JSON.parse(raw);
+      S.authorName = saved.authorName || 'Ernest';
+      S.active = saved.active || 'dld';
+      S.clients = DEFAULT_CLIENTS.map(dc => {
+        const sc = (saved.clients || []).find(c => c.id === dc.id);
+        if (!sc) return deepClone(dc);
+        if (dc.id === 'dld') {
+          // Merge DLD: preserve done states and comments from saved
+          const savedMap = {};
+          (sc.tasks || []).forEach(t => savedMap[t.id] = t);
+          const merged = DLD.map(t => {
+            const sv = savedMap[t.id];
+            return sv ? { ...t, done: sv.done, comments: sv.comments || [] } : { ...t, comments: [] };
+          });
+          // Append custom tasks
+          (sc.tasks || []).forEach(t => { if (!DLD.find(d => d.id === t.id)) merged.push({ ...t, comments: t.comments || [] }); });
+          return { ...dc, ...sc, tasks: merged };
+        }
+        return { ...dc, ...sc, tasks: (sc.tasks || []).map(t => ({ ...t, comments: t.comments || [] })) };
+      });
+      // Append fully custom clients
+      (saved.clients || []).forEach(sc => {
+        if (!DEFAULT_CLIENTS.find(dc => dc.id === sc.id)) {
+          S.clients.push({ ...sc, tasks: (sc.tasks || []).map(t => ({ ...t, comments: t.comments || [] })) });
+        }
+      });
+    } else {
+      S.clients = deepClone(DEFAULT_CLIENTS);
+    }
+  } catch(e) {
+    S.clients = deepClone(DEFAULT_CLIENTS);
+  }
+}
+
+function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+// ── HELPERS ────────────────────────────────────
+const ac = () => S.clients.find(c => c.id === S.active);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const ini = n => n.split(' ').slice(0,2).map(w=>w[0]||'').join('').toUpperCase();
+
+function toast(msg, dur=2500) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── RENDER ─────────────────────────────────────
+function render() { renderSidebar(); renderContent(); }
+
+function renderSidebar() {
+  const all = S.clients.flatMap(c => c.tasks);
+  document.getElementById('sTotal').textContent = all.length;
+  document.getElementById('sDone').textContent = all.filter(t=>t.done).length;
+  document.getElementById('sHigh').textContent = all.filter(t=>t.pri==='high'&&!t.done).length;
+
+  document.getElementById('clientList').innerHTML = S.clients.map(c => {
+    const open = c.tasks.filter(t=>!t.done).length;
+    return `<div class="ctab${c.id===S.active?' active':''}" onclick="setClient('${c.id}')">
+      <div class="ctab-avatar" style="background:${c.color}">${ini(c.name)}</div>
+      <div class="ctab-info">
+        <div class="ctab-name">${esc(c.name)}</div>
+        <div class="ctab-type">${esc(c.type)}</div>
+      </div>
+      <div class="ctab-count${open===0?' done':''}"> ${open===0?'✓':open}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderContent() {
+  const c = ac();
+  if (!c) { document.getElementById('content').innerHTML = '<div class="empty"><div class="empty-icon">🏢</div>Select a client</div>'; return; }
+
+  const tasks = c.tasks;
+  const done = tasks.filter(t=>t.done).length;
+  const total = tasks.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  const highLeft = tasks.filter(t=>t.pri==='high'&&!t.done).length;
+
+  // Filter
+  let filtered = tasks;
+  if (S.filter==='todo') filtered = tasks.filter(t=>!t.done);
+  else if (S.filter==='done') filtered = tasks.filter(t=>t.done);
+  else if (S.filter==='high') filtered = tasks.filter(t=>t.pri==='high');
+  else if (S.filter==='comments') filtered = tasks.filter(t=>t.comments&&t.comments.length>0);
+  else if (S.filter!=='all') filtered = tasks.filter(t=>t.sec===S.filter);
+
+  // Group
+  const grouped = {};
+  filtered.forEach(t => { (grouped[t.sec] = grouped[t.sec]||[]).push(t); });
+  const orderedSecs = Object.keys(SECS).filter(k=>grouped[k]);
+  Object.keys(grouped).forEach(k=>{ if (!orderedSecs.includes(k)) orderedSecs.push(k); });
+
+  // Filter tabs
+  const uniqSecs = [...new Set(tasks.map(t=>t.sec))];
+  const commentCount = tasks.filter(t=>t.comments&&t.comments.length>0).length;
+
+  const filterHtml = `<div class="filters">
+    ${[
+      ['all',      `All (${total})`],
+      ['todo',     `To Do (${tasks.filter(t=>!t.done).length})`],
+      ['high',     `🔴 High (${highLeft})`],
+      ['done',     `✅ Done (${done})`],
+      ['comments', `💬 Has Comments (${commentCount})`],
+    ].map(([k,l]) => `<button class="ftab${S.filter===k?' active':''}" onclick="setFilter('${k}')">${l}</button>`).join('')}
+    ${uniqSecs.map(s => {
+      const def = SECS[s]||{label:s,icon:'📌'};
+      const n = tasks.filter(t=>t.sec===s&&!t.done).length;
+      return `<button class="ftab${S.filter===s?' active':''}" onclick="setFilter('${s}')">${def.icon} ${def.label.split(' ')[0]} (${n})</button>`;
+    }).join('')}
+  </div>`;
+
+  // Sections
+  let sectionsHtml = '';
+  if (orderedSecs.length===0) {
+    sectionsHtml = `<div class="empty"><div class="empty-icon">🎉</div>No tasks here${S.filter!=='all'?' — try a different filter':''}</div>`;
+  } else {
+    orderedSecs.forEach(key => {
+      const def = SECS[key]||{label:key,icon:'📌',bg:'#F8FAFC'};
+      const ts = grouped[key];
+      const secDone = ts.filter(t=>t.done).length;
+      sectionsHtml += `<div class="sec">
+        <div class="sec-hd">
+          <div class="sec-icon" style="background:${def.bg}">${def.icon}</div>
+          <div class="sec-name">${esc(def.label)}</div>
+          <div class="sec-count">${secDone}/${ts.length}</div>
+        </div>
+        ${ts.map(t => taskHtml(t)).join('')}
+        ${!S.readonly && S.filter!=='done' ? addRowHtml(key) : ''}
+      </div>`;
+    });
+  }
+
+  const readonlyBanner = S.readonly
+    ? `<div class="readonly-banner">👁 You're viewing a read-only snapshot of this board. Tasks and comments cannot be edited.</div>`
+    : '';
+
+  document.getElementById('content').innerHTML = `
+    <div class="client-hd">
+      <div class="client-hd-av" style="background:${c.color}">${ini(c.name)}</div>
+      <div class="client-hd-info">
+        <div class="client-hd-name">${esc(c.name)}</div>
+        <div class="client-hd-sub">${esc(c.type)}${c.ctx?' · '+esc(c.ctx.slice(0,60)):''}</div>
+      </div>
+      ${!S.readonly ? `<div class="client-hd-actions">
+        <button class="btn btn-ghost" onclick="openShareModal()">⬡ Share</button>
+        <button class="btn btn-purple" id="aiBtn" onclick="openAIModal()">⚡ AI Sync</button>
+      </div>` : ''}
+    </div>
+
+    ${readonlyBanner}
+
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Total Tasks</div><div class="kpi-val">${total}</div><div class="kpi-sub">${done} completed</div></div>
+      <div class="kpi"><div class="kpi-label">To Do</div><div class="kpi-val ${tasks.filter(t=>!t.done).length>0?'r':'g'}">${tasks.filter(t=>!t.done).length}</div><div class="kpi-sub">remaining</div></div>
+      <div class="kpi"><div class="kpi-label">High Priority</div><div class="kpi-val ${highLeft>0?'r':'g'}">${highLeft}</div><div class="kpi-sub">need attention</div></div>
+      <div class="kpi"><div class="kpi-label">Completion</div><div class="kpi-val ${pct>=80?'g':pct>=40?'':'r'}">${pct}%</div><div class="kpi-sub">overall progress</div></div>
+    </div>
+
+    <div class="prog-row">
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="prog-label">${done} / ${total} tasks complete</div>
+    </div>
+
+    ${filterHtml}
+    ${sectionsHtml}
+  `;
+
+  // Restore open comment panels
+  Object.keys(S.openComments).forEach(tid => {
+    if (S.openComments[tid]) {
+      const panel = document.getElementById('cp_' + tid);
+      if (panel) panel.classList.add('open');
+    }
+  });
+}
+
+function taskHtml(t) {
+  const priCls = {high:'tag-high',med:'tag-med',low:'tag-low'};
+  const priLbl = {high:'High',med:'Medium',low:'Low'};
+  const hasComments = t.comments && t.comments.length > 0;
+  const commentsHtml = hasComments ? t.comments.map((cm,i) => `
+    <div class="comment-item">
+      <div class="comment-avatar">${ini(cm.author||'?')}</div>
+      <div class="comment-body">
+        <div class="comment-meta"><strong>${esc(cm.author||'Unknown')}</strong> · ${esc(cm.date||'')}</div>
+        <div class="comment-text">${esc(cm.text)}</div>
+      </div>
+      ${!S.readonly ? `<button class="comment-del" onclick="deleteComment(event,'${t.id}',${i})">✕</button>` : ''}
+    </div>`).join('') : '';
+
+  return `<div class="task-wrap">
+    <div class="task${t.done?' done':''}${hasComments?' has-comments':''}${t.isAI?' ai-new':''}" onclick="toggleTask('${t.id}')">
+      <div class="task-check">${t.done?'✓':''}</div>
+      <div class="task-body">
+        <div class="task-title">${esc(t.title)}</div>
+        <div class="task-tags">
+          <span class="tag ${priCls[t.pri]||'tag-low'}">${priLbl[t.pri]||t.pri}</span>
+          ${t.camp?`<span class="tag tag-camp">${esc(t.camp)}</span>`:''}
+          ${t.isAI?`<span class="tag tag-ai">⚡ AI</span>`:''}
+          ${hasComments?`<span class="tag" style="background:var(--yellow-pale);color:var(--yellow)">💬 ${t.comments.length}</span>`:''}
+        </div>
+        ${t.note?`<div class="task-note">${esc(t.note)}</div>`:''}
+      </div>
+      <div class="task-actions" onclick="event.stopPropagation()">
+        <button class="task-icon-btn comment-btn${hasComments?' has-c':''}" title="Comments" onclick="toggleComments('${t.id}')">
+          💬${hasComments?`<span class="comment-count-badge">${t.comments.length}</span>`:''}
+        </button>
+        ${!S.readonly?`<button class="task-icon-btn" title="Delete" onclick="deleteTask(event,'${t.id}')">✕</button>`:''}
+      </div>
+    </div>
+    <div class="comments-panel" id="cp_${t.id}">
+      ${commentsHtml}
+      ${!S.readonly ? `<div class="comment-add-row">
+        <textarea class="comment-input" id="ci_${t.id}" placeholder="Add a comment…" rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment('${t.id}')}"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="comment-submit" onclick="submitComment('${t.id}')">Post</button>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+
+function addRowHtml(sec) {
+  return `<div class="add-row">
+    <input class="add-input" id="ar_${sec}" placeholder="Add a task…" onkeydown="if(event.key==='Enter')addTask('${sec}')">
+    <button class="add-btn" onclick="addTask('${sec}')">+ Add</button>
+  </div>`;
+}
+
+// ── ACTIONS ────────────────────────────────────
+function setClient(id) { S.active=id; S.filter='all'; S.openComments={}; save(); render(); }
+function setFilter(f) { S.filter=f; render(); }
+
+function toggleTask(id) {
+  if (S.readonly) return;
+  const c = ac(); if (!c) return;
+  const t = c.tasks.find(x=>x.id===id);
+  if (t) { t.done=!t.done; save(); render(); }
+}
+
+function deleteTask(e, id) {
+  e.stopPropagation();
+  if (S.readonly) return;
+  const c = ac(); if (!c) return;
+  c.tasks = c.tasks.filter(t=>t.id!==id);
+  delete S.openComments[id];
+  save(); render(); toast('Task removed');
+}
+
+function addTask(sec) {
+  if (S.readonly) return;
+  const inp = document.getElementById('ar_'+sec); if (!inp) return;
+  const title = inp.value.trim(); if (!title) return;
+  const c = ac(); if (!c) return;
+  c.tasks.push({ id:'ct_'+Date.now(), sec, pri:'med', title, note:'', camp:'', done:false, comments:[], isAI:false });
+  save(); render();
+}
+
+function toggleComments(tid) {
+  S.openComments[tid] = !S.openComments[tid];
+  const panel = document.getElementById('cp_'+tid);
+  if (panel) panel.classList.toggle('open', S.openComments[tid]);
+}
+
+function submitComment(tid) {
+  if (S.readonly) return;
+  const inp = document.getElementById('ci_'+tid); if (!inp) return;
+  const text = inp.value.trim(); if (!text) return;
+  const c = ac(); if (!c) return;
+  const t = c.tasks.find(x=>x.id===tid); if (!t) return;
+  if (!t.comments) t.comments = [];
+  t.comments.push({
+    author: S.authorName || 'Ernest',
+    date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+    text
+  });
+  S.openComments[tid] = true;
+  save(); render();
+  // Re-open panel after render
+  const panel = document.getElementById('cp_'+tid);
+  if (panel) panel.classList.add('open');
+}
+
+function deleteComment(e, tid, idx) {
+  e.stopPropagation();
+  if (S.readonly) return;
+  const c = ac(); if (!c) return;
+  const t = c.tasks.find(x=>x.id===tid); if (!t||!t.comments) return;
+  t.comments.splice(idx, 1);
+  S.openComments[tid] = true;
+  save(); render();
+  const panel = document.getElementById('cp_'+tid);
+  if (panel) panel.classList.add('open');
+}
+
+// ── ADD CLIENT ────────────────────────────────
+function openAddClientModal() { document.getElementById('addClientModal').classList.add('open'); }
+function confirmAddClient() {
+  const name = document.getElementById('nc_name').value.trim();
+  if (!name) { toast('Enter a client name'); return; }
+  const id = 'c_'+Date.now();
+  S.clients.push({ id, name, type: document.getElementById('nc_type').value.trim()||'General', color: COLORS[S.clients.length%COLORS.length], ctx: document.getElementById('nc_ctx').value.trim(), tasks:[] });
+  S.active = id;
+  save(); render();
+  closeOverlay('addClientModal');
+  ['nc_name','nc_type','nc_ctx'].forEach(i=>document.getElementById(i).value='');
+  toast(`✅ ${name} added`);
+}
+
+// ── SHARE ─────────────────────────────────────
+function openShareModal() {
+  const c = ac(); if (!c) return;
+  document.getElementById('shareSub').textContent = `Share the "${c.name}" board. Co-workers get a read-only snapshot with all tasks, statuses, and your comments.`;
+  document.getElementById('shareBox').style.display = 'none';
+  document.getElementById('shareAuthorName').value = S.authorName || 'Ernest';
+  document.getElementById('shareModal').classList.add('open');
+}
+
+function generateShareLink() {
+  const authorName = document.getElementById('shareAuthorName').value.trim() || 'Ernest';
+  S.authorName = authorName;
+  save();
+  const c = ac(); if (!c) return;
+  const payload = { client: deepClone(c), authorName };
+  const encoded = btoa(JSON.stringify(payload));
+  const url = window.location.href.split('#')[0] + '#snap:' + encoded;
+  document.getElementById('shareLink').textContent = url;
+  document.getElementById('shareBox').style.display = 'flex';
+  document.getElementById('shareNote').innerHTML = `<strong>✅ Link generated.</strong> This snapshot includes all tasks, statuses, and comments as of right now. Regenerate any time to push a fresh update.`;
+}
+
+function copyLink() {
+  const text = document.getElementById('shareLink').textContent;
+  navigator.clipboard.writeText(text)
+    .then(() => toast('Link copied!'))
+    .catch(() => toast('Select and copy the link above'));
+}
+
+// ── AI SYNC ───────────────────────────────────
+function openAIModal() {
+  document.getElementById('aiLog').classList.remove('open');
+  document.getElementById('aiInput').value = '';
+  document.getElementById('aiModal').classList.add('open');
+}
+
+async function runAISync() {
+  const ctx = document.getElementById('aiInput').value.trim();
+  if (!ctx) { toast('Paste some text first'); return; }
+  const c = ac(); if (!c) return;
+
+  const btn = document.getElementById('aiBtn');
+  btn.textContent = '⏳ Extracting…'; btn.style.pointerEvents='none'; btn.style.opacity='0.7';
+
+  const existing = c.tasks.map(t=>t.title).join('\n');
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:`You are a task extraction assistant for a dental marketing agency.
+
+Client: ${c.name} | Service: ${c.type}
+Context: ${c.ctx||'N/A'}
+
+Tasks already on the board (do NOT duplicate):
+${existing||'None yet'}
+
+From the notes below, extract all NEW actionable tasks not already listed.
+Return ONLY a valid JSON array, no markdown, no explanation:
+[{"title":"...","note":"brief context","sec":"budget|conversion|campaign|assetgroup|keywords|adcopy|extensions|reporting|content|seo|social|general","pri":"high|med|low","camp":"campaign name or empty"}]
+If nothing new, return [].
+
+Notes:
+${ctx}`}]
+      })
+    });
+
+    const data = await res.json();
+    const raw = (data.content||[]).map(b=>b.text||'').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const extracted = JSON.parse(clean);
+
+    btn.textContent='⚡ AI Sync'; btn.style.pointerEvents=''; btn.style.opacity='';
+
+    if (!Array.isArray(extracted)||extracted.length===0) {
+      document.getElementById('aiLog').classList.add('open');
+      document.getElementById('aiLogBody').textContent = 'No new actionable tasks found — board is up to date!';
+      return;
+    }
+
+    const newTasks = extracted.map((t,i)=>({
+      id:'ai_'+Date.now()+'_'+i, sec:t.sec||'general', pri:t.pri||'med',
+      title:t.title, note:t.note||'', camp:t.camp||'', done:false, comments:[], isAI:true
+    }));
+
+    c.tasks.push(...newTasks);
+    save();
+
+    document.getElementById('aiLog').classList.add('open');
+    document.getElementById('aiLogBody').innerHTML = `Added <strong>${newTasks.length} task${newTasks.length>1?'s':''}</strong>:<br>${newTasks.map(t=>'• '+esc(t.title)).join('<br>')}`;
+
+    setTimeout(()=>{ closeOverlay('aiModal'); render(); toast(`⚡ ${newTasks.length} tasks added`, 3000); }, 2200);
+
+  } catch(err) {
+    btn.textContent='⚡ AI Sync'; btn.style.pointerEvents=''; btn.style.opacity='';
+    document.getElementById('aiLog').classList.add('open');
+    document.getElementById('aiLogBody').textContent = 'Error: '+(err.message||'Could not reach Claude API. Run this as a Claude.ai artifact for AI sync to work.');
+  }
+}
+
+// ── OVERLAY DISMISS ────────────────────────────
+document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{ if(e.target===el) el.classList.remove('open'); }));
+
+// ── INIT ──────────────────────────────────────
+load();
+render();
+</script>
+</body>
+</html>
